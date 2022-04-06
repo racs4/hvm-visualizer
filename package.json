@@ -1,0 +1,17 @@
+{
+  "name": "hvm-visualizer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "hvm-visualizer": "index.js"
+  },
+  "scripts": {
+    "serve": "serve -s src -l 4000"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "serve": "^13.0.2"
+  }
+}

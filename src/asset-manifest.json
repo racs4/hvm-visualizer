@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/static/css/main.40e987fc.css",
+    "main.js": "/static/js/main.de70d8c1.js",
+    "static/media/telegram_icon.png": "/static/media/telegram_icon.9b3668708410c45831f0.png",
+    "static/media/twitch_icon.png": "/static/media/twitch_icon.a95ce441b5f4b6584899.png",
+    "static/media/kindelia_logo.svg": "/static/media/kindelia_logo.d41e75d38f4e76bf6eb0b5e63721b8ca.svg",
+    "index.html": "/index.html"
+  },
+  "entrypoints": [
+    "static/css/main.40e987fc.css",
+    "static/js/main.de70d8c1.js"
+  ]
+}
