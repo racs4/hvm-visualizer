@@ -25,6 +25,13 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <script src="gambiarra.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function (event) {
+        const textarea = document.querySelector("textarea");
+        const value = ``;
+        textarea.value = value;
+        document.querySelector("button").click();
+      });
+    </script>
   </body>
 </html>
