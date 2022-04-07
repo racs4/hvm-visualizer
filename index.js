@@ -95,6 +95,8 @@ function gambiarraContent(debugContent) {
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="Kindelia" />
+    <link rel="apple-touch-icon" href="/logo192.png" />
+    <link rel="manifest" href="/manifest.json" />
     <title>Kindelia</title>
     <script>
       if (
@@ -108,8 +110,8 @@ function gambiarraContent(debugContent) {
           window.__REACT_DEVTOOLS_GLOBAL_HOOK__[_] =
             "function" == typeof O ? () => {} : null;
     </script>
-    <script defer="defer" src="/static/js/main.de70d8c1.js"></script>
-    <link href="/static/css/main.40e987fc.css" rel="stylesheet" />
+    <script defer="defer" src="/static/js/main.d41a54f9.js"></script>
+    <link href="/static/css/main.faee07c5.css" rel="stylesheet" />
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -123,7 +125,7 @@ function gambiarraContent(debugContent) {
       });
     </script>
   </body>
-</html>  
+</html>
 `;
 }
 
