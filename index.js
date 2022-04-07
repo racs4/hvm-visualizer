@@ -7,12 +7,18 @@ const exec = require("child_process").execSync;
 const http = require('http');
 const url = require('url');
 const fs = require('fs');
-const port = process.argv[3] || 9000;
+const port = process.argv[4] || 9000;
 
 
 function main() {
-  const filePath = process.argv[2];
-  const debugContent = readFileSync(filePath).toString().replaceAll("${", "\\${");
+  const type = process.argv[2];
+  const arg = process.argv[3];
+
+  if (!type || !arg || (type != "t" && type != "f")) {
+    showMessage();
+  }
+
+  const debugContent = type === "f" ? readFileSync(arg).toString().replaceAll("${", "\\${") : arg;
 
   // const gambiarraPath = path.join(__dirname, "src", "index.html");
   // const gambiarraFile = readFileSync(gambiarraPath);
@@ -119,6 +125,14 @@ function gambiarraContent(debugContent) {
   </body>
 </html>  
 `;
+}
+
+function showMessage() {
+  console.log(
+    "To use with text: hvm-visualizer t <text-content>\n" +
+    "To use with file: hvm-visualizer f <file>\n" +
+    "A fourth arg can be passed to choose the port: hvm-visualizer f file 3000\n"
+  );
 }
 
 main();
