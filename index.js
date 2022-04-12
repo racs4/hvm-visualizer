@@ -2,23 +2,40 @@
 
 const { writeFileSync, readFileSync } = require("fs");
 const path = require("path");
-const exec = require("child_process").execSync;
+const exec = require("child_process").spawnSync;
 
 const http = require('http');
 const url = require('url');
 const fs = require('fs');
-const port = process.argv[4] || 9000;
+const port = 9000;
 
+async function read(stream) {
+  const chunks = [];
+  for await (const chunk of stream) chunks.push(chunk);
+  return Buffer.concat(chunks).toString('utf8');
+}
 
-function main() {
+async function main() {
   const type = process.argv[2];
   const arg = process.argv[3];
 
-  if (!type || !arg || (type != "t" && type != "f")) {
+  if (!type || (!arg && type !== "s") || (type != "t" && type != "f" && type != "s")) {
     showMessage();
+    return;
   }
 
-  const debugContent = type === "f" ? readFileSync(arg).toString().replaceAll("${", "\\${") : arg;
+  let debugContent = (await (async function () {
+    switch (type) {
+      case "f":
+        return readFileSync(arg).toString();
+      case "s":
+        return await read(process.stdin);
+      case "t":
+        return arg;
+    }
+  })()).replaceAll("${", "\\${");
+
+  // const debugContent = type === "f" ? readFileSync(arg).toString().replaceAll("${", "\\${") : arg;
 
   // const gambiarraPath = path.join(__dirname, "src", "index.html");
   // const gambiarraFile = readFileSync(gambiarraPath);
@@ -132,9 +149,9 @@ function gambiarraContent(debugContent) {
 function showMessage() {
   console.log(
     "To use with text: hvm-visualizer t <text-content>\n" +
-    "To use with file: hvm-visualizer f <file>\n" +
-    "A fourth arg can be passed to choose the port: hvm-visualizer f file 3000\n"
+    "To use with stdin (assumes that you have hvm installed): hvm d <hvm-file> <hvm-arg> | hvm-visualizer s\n" +
+    "To use with file: hvm-visualizer f <file>\n"
   );
 }
 
-main();
+main().then().catch(err => { console.error(err); showMessage(); });
