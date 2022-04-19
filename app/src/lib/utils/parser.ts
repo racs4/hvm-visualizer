@@ -199,6 +199,17 @@ const name1: Parser<string> = (state) => {
   }
 };
 
+// Parses a character right after the parsing cursor.
+const char_here: Parser<string> = (state) => {
+  var state = { ...state };
+  var char = "";
+  if (state.index < state.code.length) {
+    char += state.code[state.index];
+    state.index += 1;
+  }
+  return [state, char.charCodeAt(0).toString()];
+};
+
 // Errors
 // ======
 
@@ -344,6 +355,53 @@ const hvm_debug_parser: Parser<HVMDebug> = (state) => {
     return [state3, { parent, children: children, type: "Node" }];
   });
 
+  // parses a list
+  const term_items = (
+    open: string,
+    close: string,
+    accName: string,
+    emptyName: string,
+    itemParser: Parser<HVMDebugTerm>
+  ): Parser<HVMDebugTermValue> =>
+    guard(match(open), (state) => {
+      let [state1] = consume(open)(state);
+      let [state2, terms] = until(match(close), (childState) => {
+        let [childState1, termResult] = itemParser(childState);
+        let [childState2] = match(",")(childState1);
+        return [childState2, termResult];
+      })(state1);
+
+      let empty: HVMDebugTerm = {
+        type: "Node",
+        parent: { type: "Name", name: emptyName, here: false },
+        children: [],
+        here: false,
+      };
+
+      let list: HVMDebugTermValue = terms.reduceRight(
+        (a: HVMDebugTerm, b: HVMDebugTerm) => ({
+          type: "Node",
+          parent: { type: "Name", name: accName, here: false },
+          children: [b, a],
+          here: false,
+        }),
+        empty
+      );
+
+      return [state2, list];
+    });
+
+  const term_list = term_items("[", "]", "Cons", "Nil", (state) => term(state));
+  const term_str = term_items('"', '"', "StrCons", "StrNil", (state) => {
+    let [state1, charCode] = char_here(state);
+    let term: HVMDebugTerm = {
+      type: "Var",
+      name: { name: charCode, type: "Name" },
+      here: false,
+    };
+    return [state1, term];
+  });
+
   // parses a lambda
   const term_lam: Parser<HVMDebugTermValue> = guard(match("λ"), (state) => {
     let [state1] = consume("λ")(state);
@@ -383,6 +441,8 @@ const hvm_debug_parser: Parser<HVMDebug> = (state) => {
   const term: Parser<HVMDebugTerm> = (state) => {
     const [state1, here] = match("$")(state);
     const [state2, term] = grammar("DebugTerm", [
+      term_list,
+      term_str,
       term_node,
       term_lam,
       term_sup,
@@ -417,7 +477,7 @@ const hvm_debug_parser: Parser<HVMDebug> = (state) => {
 const sep = /--+\n/;
 
 export function removeFlattener(code: string[]): string[] {
-  return code.filter(text => text.match(/\.[0-9]+/) == null)
+  return code.filter((text) => text.match(/\.[0-9]+/) == null);
 }
 
 export function sanitize(code: string): string {
@@ -432,6 +492,6 @@ function divide(code: string): string[] {
 }
 
 // export
-export const hvmDebugPreParser = compose(removeFlattener, divide, sanitize); 
+export const hvmDebugPreParser = compose(removeFlattener, divide, sanitize);
 export const hvmDebugParser = (code: string) =>
   hvm_debug_parser({ code, index: 0 })[1];
