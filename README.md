@@ -2,9 +2,9 @@
 
 To install: `npm i -g hvm-visualizer`
 
-To use with text: `hvm-visualizer t <text-content>`
-To use with stdin (assumes that you have hvm installed): `hvm d <hvm-file> <hvm-arg> | hvm-visualizer s`
-To use with file: `hvm-visualizer f <file>`
+- To use with text: `hvm-visualizer t <text-content>`
+- To use with stdin (assumes that you have hvm installed): `hvm d <hvm-file> <hvm-arg> | hvm-visualizer s`
+- To use with file: `hvm-visualizer f <file>`
 
 ## Contributing
 
