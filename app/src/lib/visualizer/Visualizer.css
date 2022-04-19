@@ -1,0 +1,144 @@
+.hvm-visualizer {
+  height: calc(max(700px, 100vh) - 40px);
+  width: calc(100vw - 60px);
+
+  display: flex;
+  flex-wrap: wrap;
+
+  padding: 20px;
+}
+
+.hvm-visualizer * {
+  font-family: monospace;
+  font-size: large;
+}
+
+.hvm-visualizer > * + * {
+  margin-left: 20px;
+}
+
+.hvm-visualizer textarea {
+  box-sizing: border-box;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 20px;
+  border: 2px solid black;
+
+  outline: none;
+  resize: none;
+
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: scroll;
+}
+
+.left-container {
+  width: 33%;
+  height: calc(100% - 40px);
+}
+
+.left-container .text-input {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+}
+
+.left-container .text-input textarea {
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: scroll;
+}
+
+.left-container .node-blocks {
+  height: 100%;
+  overflow: auto;
+  
+  position: relative;
+}
+
+.left-container .clear-button {
+  position: sticky;
+  bottom: 0;
+  float: right;
+
+  margin: 5px;
+}
+
+.left-container .text-wrapper {
+  border: 2px solid;
+  padding: 5px;
+  margin-bottom: 20px;
+
+  cursor: pointer;
+
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: scroll;
+}
+
+.tree-container {
+  width: 50%;
+
+  position: relative;
+
+  overflow-x: auto;
+}
+
+.hvm-tree {
+  width: 100%;
+
+  position: relative;
+
+  margin-top: 40px;
+}
+
+.pagination {
+  position: sticky;
+  top: 0;
+  left: 0;
+}
+
+.pagination input {
+  width: 6ch;
+}
+
+.pagination > * + * {
+  margin-left: 5px;
+}
+
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+.hvm-visualizer * {
+  scrollbar-width: thin;
+  scrollbar-color: #a4a1a5 #ffffff;
+}
+
+/* Chrome, Edge, and Safari */
+.hvm-visualizer *::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.hvm-visualizer *::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+.hvm-visualizer *::-webkit-scrollbar-thumb {
+  background-color: #a4a1a5;
+  border-radius: 10px;
+  border: 3px solid #ffffff;
+}
+
+.error-wrapper {
+  white-space: pre;
+}
+
+
+.error-text {
+  padding: 0 5px;
+  background-color: red;
+  color: white;
+}

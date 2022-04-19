@@ -16,134 +16,81 @@ async function read(stream) {
 }
 
 async function main() {
+  // Reading args
   const type = process.argv[2];
   const arg = process.argv[3];
-
   if (!type || (!arg && type !== "s") || (type != "t" && type != "f" && type != "s")) {
     showMessage();
     return;
   }
 
+  // Getting debug content
   let debugContent = (await (async function () {
     switch (type) {
-      case "f":
+      case "f": // from a file
         return readFileSync(arg).toString();
-      case "s":
+      case "s": // from stdin
         return await read(process.stdin);
-      case "t":
+      case "t": // from cli text
         return arg;
     }
-  })()).replaceAll("${", "\\${");
+  })()).replaceAll("${", "\\${"); // replace is needed because of JS syntax ${}
 
-  // const debugContent = type === "f" ? readFileSync(arg).toString().replaceAll("${", "\\${") : arg;
-
-  // const gambiarraPath = path.join(__dirname, "src", "index.html");
-  // const gambiarraFile = readFileSync(gambiarraPath);
-  const newGambiarraContent = gambiarraContent(debugContent);
-
-
+  // Create server
   http.createServer(function (req, res) {
-    // console.log(`${req.method} ${req.url}`);
-
-    // parse URL
+    // Parse URL
     const parsedUrl = url.parse(req.url);
-    // extract URL path
+    // Extract URL path
     let pathname = `.${parsedUrl.pathname}`;
+
+    // =========================
+    // Index route
     if (path.parse(pathname).name === ".") {
-      res.end(gambiarraContent(debugContent));
+      res.end(getHTML(debugContent));
       return;
     }
 
-    // based on the URL path, extract the file extension. e.g. .js, .doc, ...
-    const ext = path.parse(pathname).ext;
-    // maps file extension to MIME typere
-    const map = {
-      '.ico': 'image/x-icon',
-      '.html': 'text/html',
-      '.js': 'text/javascript',
-      '.json': 'application/json',
-      '.css': 'text/css',
-      '.png': 'image/png',
-      '.jpg': 'image/jpeg',
-      '.wav': 'audio/wav',
-      '.mp3': 'audio/mpeg',
-      '.svg': 'image/svg+xml',
-      '.pdf': 'application/pdf',
-      '.doc': 'application/msword'
-    };
+    // =========================
+    // All other routes
 
-    pathname = path.join(__dirname, "src", pathname);
+    // Based on the URL path, extract the file extension. e.g. .js, .doc, ...
+    const ext = path.parse(pathname).ext;
+
+    // Getting the file in the app build folder
+    pathname = path.join(__dirname, "app", "build", pathname);
     fs.access(pathname, function (err) {
       if (err) {
-        // if the file is not found, return 404
+        // If the file is not found, return 404
         res.statusCode = 404;
         res.end(`File ${pathname} not found!`);
         return;
       }
 
-      // if is a directory search for index file matching the extension
-      // if (fs.statSync(pathname).isDirectory()) pathname += '/index' + ext;
-
-      // read file from file system
+      // Read file from file system
       fs.readFile(pathname, function (err, data) {
         if (err) {
           res.statusCode = 500;
           res.end(`Error getting the file: ${err}.`);
         } else {
-          // if the file is found, set Content-type and send data
-          res.setHeader('Content-type', map[ext] || 'text/plain');
+          // If the file is found, set Content-type and send data
+          res.setHeader('Content-type', getMIME(ext) || 'text/plain');
           res.end(data);
         }
       });
     });
 
-
-  }).listen(parseInt(port));
+  }).listen(parseInt(port)); // listen in the port
 
   console.log(`Server listening on http://localhost:${port}`);
 }
 
-function gambiarraContent(debugContent) {
-  return `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta name="description" content="Kindelia" />
-    <link rel="apple-touch-icon" href="/logo192.png" />
-    <link rel="manifest" href="/manifest.json" />
-    <title>Kindelia</title>
-    <script>
-      if (
-        ((window.__REACT_DEVTOOLS_SHOW_INLINE_WARNINGS_AND_ERRORS__ = !1),
-        (window.__REACT_DEVTOOLS_HIDE_CONSOLE_LOGS_IN_STRICT_MODE__ = !0),
-        "object" == typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__)
-      )
-        for (let [_, O] of Object.entries(
-          window.__REACT_DEVTOOLS_GLOBAL_HOOK__
-        ))
-          window.__REACT_DEVTOOLS_GLOBAL_HOOK__[_] =
-            "function" == typeof O ? () => {} : null;
-    </script>
-    <script defer="defer" src="/static/js/main.d41a54f9.js"></script>
-    <link href="/static/css/main.faee07c5.css" rel="stylesheet" />
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <script>
-      document.addEventListener("DOMContentLoaded", function (event) {
-        const textarea = document.querySelector("textarea");
-        const value = \`${debugContent} \`;
-        textarea.value = value;
-        document.querySelector("button").click();
-      });
-    </script>
-  </body>
-</html>
-`;
+function getHTML(debugContent) {
+  // Get index.html in /app/build folder
+  // Replace the necessary place with the debug content
+  return fs
+    .readFileSync(path.join(__dirname, "app", "build", "index.html"))
+    .toString()
+    .replace(".value = \"\"", ".value = `" + debugContent + "`");
 }
 
 function showMessage() {
@@ -152,6 +99,26 @@ function showMessage() {
     "To use with stdin (assumes that you have hvm installed): hvm d <hvm-file> <hvm-arg> | hvm-visualizer s\n" +
     "To use with file: hvm-visualizer f <file>\n"
   );
+}
+
+function getMIME(extension) {
+  // Maps file extension to MIME typere
+  const map = {
+    '.ico': 'image/x-icon',
+    '.html': 'text/html',
+    '.js': 'text/javascript',
+    '.json': 'application/json',
+    '.css': 'text/css',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.wav': 'audio/wav',
+    '.mp3': 'audio/mpeg',
+    '.svg': 'image/svg+xml',
+    '.pdf': 'application/pdf',
+    '.doc': 'application/msword'
+  };
+
+  return map[extension];
 }
 
 main().then().catch(err => { console.error(err); showMessage(); });
