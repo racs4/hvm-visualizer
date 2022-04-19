@@ -416,6 +416,10 @@ const hvm_debug_parser: Parser<HVMDebug> = (state) => {
 // =========
 const sep = /--+\n/;
 
+export function removeFlattener(code: string[]): string[] {
+  return code.filter(text => text.match(/\.[0-9]+/) == null)
+}
+
 export function sanitize(code: string): string {
   return code
     .replace(sep, "")
@@ -428,6 +432,6 @@ function divide(code: string): string[] {
 }
 
 // export
-export const hvmDebugPreParser = compose(divide, sanitize);
+export const hvmDebugPreParser = compose(removeFlattener, divide, sanitize); 
 export const hvmDebugParser = (code: string) =>
   hvm_debug_parser({ code, index: 0 })[1];
