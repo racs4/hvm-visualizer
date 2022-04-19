@@ -35,7 +35,7 @@ async function main() {
         return arg;
     }
   })()).replaceAll("${", "\\${"); // replace is needed because of JS syntax ${}
-
+  
   // Create server
   http.createServer(function (req, res) {
     // Parse URL
@@ -90,7 +90,7 @@ function getHTML(debugContent) {
   return fs
     .readFileSync(path.join(__dirname, "app", "build", "index.html"))
     .toString()
-    .replace(".value = \"\"", ".value = `" + debugContent + "`");
+    .replace(".value=\"\"", ".value = `" + debugContent + "`");
 }
 
 function showMessage() {
